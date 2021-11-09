@@ -37,12 +37,12 @@ export class AppController {
 
     @Get('auth/google-callback')
     @Redirect()
-    googleCallback(
+    async googleCallback(
         @Query() query
     ) {
         let uri = Buffer.from(query.state, 'base64').toString('ascii')
         let code = query.code
-        let callbackUri = this.googleService.generateCallbackUri(code, uri)
+        let callbackUri = await this.googleService.generateCallbackUri(code, uri)
 
         return {
             statusCode: HttpStatus.FOUND,
