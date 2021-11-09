@@ -40,7 +40,7 @@ export class FacebookService {
             redirect_uri: this.configService.get(<string>('facebook.redirectUri')),
             code: code,
         }).toString()
-        return axios.post(this.configService.get(<string>('google.accessTokenUri')), params).then((response) => {
+        return axios.post(this.configService.get(<string>('google.accessTokenUri')), {params}).then((response) => {
             return response.data
         })
     }
