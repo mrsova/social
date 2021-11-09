@@ -3,6 +3,7 @@ import { AppController } from './app.controller';
 import configuration from './config';
 import {ConfigModule} from "@nestjs/config";
 import {GoogleService} from "./services/google.service";
+import {FacebookService} from "./services/facebook.service";
 
 @Module({
   imports: [
@@ -13,7 +14,8 @@ import {GoogleService} from "./services/google.service";
   ],
   controllers: [AppController],
   providers: [
-      GoogleService
+      GoogleService,
+      FacebookService
   ],
 })
 export class AppModule {}

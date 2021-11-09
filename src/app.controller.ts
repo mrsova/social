@@ -1,10 +1,13 @@
 import {Controller, Get, HttpException, HttpStatus, Query, Redirect} from '@nestjs/common';
 import {GoogleService} from "./services/google.service";
+import {FacebookService} from "./services/facebook.service";
 
 @Controller()
 export class AppController {
     constructor(
-        private readonly googleService: GoogleService
+        private readonly googleService: GoogleService,
+        private readonly facebookService: FacebookService,
+
     ) {}
 
     @Get()
@@ -32,7 +35,14 @@ export class AppController {
                 url: this.googleService.getRedirectUri(callbackUri),
             }
         }
+        if (type == "facebook") {
+            return {
+                statusCode: HttpStatus.FOUND,
+                url: this.facebookService.getRedirectUri(callbackUri),
+            }
+        }
 
+        throw new HttpException('type is not defined', HttpStatus.BAD_REQUEST);
     }
 
     @Get('auth/google-callback')
@@ -43,6 +53,21 @@ export class AppController {
         let uri = Buffer.from(query.state, 'base64').toString('ascii')
         let code = query.code
         let callbackUri = await this.googleService.generateCallbackUri(code, uri)
+
+        return {
+            statusCode: HttpStatus.FOUND,
+            url: callbackUri,
+        }
+    }
+
+    @Get('auth/facebook-callback')
+    @Redirect()
+    async facebookCallback(
+        @Query() query
+    ) {
+        let uri = Buffer.from(query.state, 'base64').toString('ascii')
+        let code = query.code
+        let callbackUri = await this.facebookService.generateCallbackUri(code, uri)
 
         return {
             statusCode: HttpStatus.FOUND,
