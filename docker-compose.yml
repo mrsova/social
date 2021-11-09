@@ -1,0 +1,27 @@
+version: "3.7"
+
+services:
+  api:
+    container_name: social.api
+    build:
+      context: docker
+      dockerfile: node/Dockerfile
+    tty: true
+    volumes:
+      - .:/app
+
+  nginx:
+    container_name: social.nginx
+    build:
+      context: docker
+      dockerfile: nginx/Dockerfile
+    volumes:
+      - .:/app
+    environment:
+      VIRTUAL_HOST: ${DOCKER_SITE_URL}
+      HTTPS_METHOD: nohttp
+
+networks:
+  default:
+    external:
+      name: proxy_proxy
