@@ -23,7 +23,7 @@ export class FacebookService {
             const response = await this.getAccessToken(code)
             let params = new URLSearchParams({
                 token: response.access_token,
-                type: 'facebook',
+                type: 'Facebook',
             }).toString()
             return uri + '?' + params;
 

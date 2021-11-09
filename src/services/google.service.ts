@@ -25,7 +25,7 @@ export class GoogleService {
             const response = await this.getAccessToken(code)
             let params = new URLSearchParams({
                 token: response.id_token,
-                type: 'google',
+                type: 'Google',
             }).toString()
             return uri + '?' + params;
 
