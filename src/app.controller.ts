@@ -13,6 +13,7 @@ export class AppController {
     }
 
     @Get('auth/redirect-social')
+    @Redirect()
     redirectSocial(@Query() query) {
         if (typeof query.callbackUri == "undefined") {
             throw new HttpException('callbackUri is required', HttpStatus.BAD_REQUEST);
@@ -26,7 +27,10 @@ export class AppController {
         let type = query.type
 
         if (type == "google") {
-            return this.googleService.getRedirectUri(callbackUri);
+            return {
+                statusCode: HttpStatus.FOUND,
+                url: this.googleService.getRedirectUri(callbackUri),
+            }
         }
 
     }
