@@ -33,15 +33,17 @@ export class FacebookService {
         }
     }
 
-    private async getAccessToken(code): Promise<any> {
-        let params = new URLSearchParams({
+    private getAccessToken(code): Promise<any> {
+        const params = {
             client_id: this.configService.get(<string>('facebook.clientId')),
             client_secret: this.configService.get(<string>('facebook.clientSecret')),
             redirect_uri: this.configService.get(<string>('facebook.redirectUri')),
             code: code,
-        }).toString()
-        return axios.post(this.configService.get(<string>('google.accessTokenUri')), {params}).then((response) => {
+        }
+        return axios.get(this.configService.get(<string>('facebook.accessTokenUri')), {params}).then(response => {
             return response.data
+        }).catch((error) => {
+            console.log(error.response.data);
         })
     }
 }
