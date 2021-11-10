@@ -38,7 +38,7 @@ export class AppleService {
         }
     }
 
-     generateSecretKey(): string {
+     private generateSecretKey(): string {
          const privateKey = fs.readFileSync(this.configService.get(<string>('apple.privateKeyPath'))).toString();
          const headers = {
              alg: "ES256",

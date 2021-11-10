@@ -45,7 +45,6 @@ export class AppController {
         }
 
         if (type == "apple") {
-            return this.appleService.getRedirectUri(callbackUri)
             return {
                 statusCode: HttpStatus.FOUND,
                 url: this.appleService.getRedirectUri(callbackUri),
@@ -83,11 +82,6 @@ export class AppController {
             statusCode: HttpStatus.FOUND,
             url: callbackUri,
         }
-    }
-
-    @Get('test')
-    test() {
-        return this.appleService.generateSecretKey()
     }
 
     @Get('auth/apple-callback')
