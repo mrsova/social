@@ -2,7 +2,6 @@ import {HttpException, HttpStatus, Injectable} from "@nestjs/common";
 import {ConfigService} from "@nestjs/config";
 import axios from "axios";
 import * as Jwt from "jsonwebtoken"
-import {JwtPayload} from "jsonwebtoken";
 import * as fs from "fs";
 
 @Injectable()
@@ -27,7 +26,7 @@ export class AppleService {
         try {
             const response = await this.getAccessToken(code)
             let params = new URLSearchParams({
-                token: response.access_token,
+                token: response.id_token,
                 type: 'Apple',
             }).toString()
             return uri + '?' + params;
