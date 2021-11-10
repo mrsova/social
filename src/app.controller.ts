@@ -18,7 +18,7 @@ export class AppController {
     }
 
     @Get('auth/redirect-social')
-    //@Redirect()
+    @Redirect()
     redirectSocial(@Query() query) {
         if (typeof query.callbackUri == "undefined") {
             throw new HttpException('callbackUri is required', HttpStatus.BAD_REQUEST);
