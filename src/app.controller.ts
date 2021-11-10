@@ -1,12 +1,14 @@
 import {Controller, Get, HttpException, HttpStatus, Query, Redirect} from '@nestjs/common';
 import {GoogleService} from "./services/google.service";
 import {FacebookService} from "./services/facebook.service";
+import {AppleService} from "./services/apple.service";
 
 @Controller()
 export class AppController {
     constructor(
         private readonly googleService: GoogleService,
         private readonly facebookService: FacebookService,
+        private readonly appleService: AppleService,
 
     ) {}
 
@@ -16,7 +18,7 @@ export class AppController {
     }
 
     @Get('auth/redirect-social')
-    @Redirect()
+    //@Redirect()
     redirectSocial(@Query() query) {
         if (typeof query.callbackUri == "undefined") {
             throw new HttpException('callbackUri is required', HttpStatus.BAD_REQUEST);
@@ -39,6 +41,14 @@ export class AppController {
             return {
                 statusCode: HttpStatus.FOUND,
                 url: this.facebookService.getRedirectUri(callbackUri),
+            }
+        }
+
+        if (type == "apple") {
+            return this.appleService.getRedirectUri(callbackUri)
+            return {
+                statusCode: HttpStatus.FOUND,
+                url: this.appleService.getRedirectUri(callbackUri),
             }
         }
 
@@ -68,6 +78,26 @@ export class AppController {
         let uri = Buffer.from(query.state, 'base64').toString('ascii')
         let code = query.code
         let callbackUri = await this.facebookService.generateCallbackUri(code, uri)
+
+        return {
+            statusCode: HttpStatus.FOUND,
+            url: callbackUri,
+        }
+    }
+
+    @Get('test')
+    test() {
+        return this.appleService.generateSecretKey()
+    }
+
+    @Get('auth/apple-callback')
+    @Redirect()
+    async appleCallback(
+        @Query() query
+    ) {
+        let uri = Buffer.from(query.state, 'base64').toString('ascii')
+        let code = query.code
+        let callbackUri = await this.appleService.generateCallbackUri(code, uri)
 
         return {
             statusCode: HttpStatus.FOUND,
