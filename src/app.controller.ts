@@ -1,15 +1,10 @@
-import {Controller, Get, HttpException, HttpStatus, Query, Redirect} from '@nestjs/common';
-import {GoogleService} from "./services/google.service";
-import {FacebookService} from "./services/facebook.service";
-import {AppleService} from "./services/apple.service";
+import {Controller, Get, HttpException, HttpStatus, Param, Query, Redirect} from '@nestjs/common';
+import {ProviderResolver} from "./services/provider.resolver";
 
 @Controller()
 export class AppController {
     constructor(
-        private readonly googleService: GoogleService,
-        private readonly facebookService: FacebookService,
-        private readonly appleService: AppleService,
-
+        private readonly providerResolver: ProviderResolver,
     ) {}
 
     @Get()
@@ -21,82 +16,36 @@ export class AppController {
     @Redirect()
     redirectSocial(@Query() query) {
         if (typeof query.callbackUri == "undefined") {
-            throw new HttpException('callbackUri is required', HttpStatus.BAD_REQUEST);
+            throw new HttpException('callbackUri is required', HttpStatus.BAD_REQUEST)
         }
         if (typeof query.type == "undefined") {
-            throw new HttpException('type is required', HttpStatus.BAD_REQUEST);
+            throw new HttpException('type is required', HttpStatus.BAD_REQUEST)
         }
-
         let callbackUri = Buffer.from(query.callbackUri).toString('base64')
-
         let type = query.type
 
-        if (type == "google") {
-            return {
-                statusCode: HttpStatus.FOUND,
-                url: this.googleService.getRedirectUri(callbackUri),
-            }
-        }
-        if (type == "facebook") {
-            return {
-                statusCode: HttpStatus.FOUND,
-                url: this.facebookService.getRedirectUri(callbackUri),
-            }
-        }
+        let redirectUri = this.providerResolver.getProvider(type).getRedirectUri(callbackUri)
 
-        if (type == "apple") {
-            return {
-                statusCode: HttpStatus.FOUND,
-                url: this.appleService.getRedirectUri(callbackUri),
-            }
+        return {
+            statusCode: HttpStatus.FOUND,
+            url: redirectUri
         }
-
-        throw new HttpException('type is not defined', HttpStatus.BAD_REQUEST);
     }
 
-    @Get('auth/google-callback')
+    @Get('auth/:social-callback')
     @Redirect()
-    async googleCallback(
-        @Query() query
+    async callback(
+        @Query() query,
+        @Param('social') social: string
     ) {
         let uri = Buffer.from(query.state, 'base64').toString('ascii')
         let code = query.code
-        let callbackUri = await this.googleService.generateCallbackUri(code, uri)
+
+        let callbackUri = await this.providerResolver.getProvider(social).generateCallbackUri(code, uri)
 
         return {
             statusCode: HttpStatus.FOUND,
             url: callbackUri,
         }
     }
-
-    @Get('auth/facebook-callback')
-    @Redirect()
-    async facebookCallback(
-        @Query() query
-    ) {
-        let uri = Buffer.from(query.state, 'base64').toString('ascii')
-        let code = query.code
-        let callbackUri = await this.facebookService.generateCallbackUri(code, uri)
-
-        return {
-            statusCode: HttpStatus.FOUND,
-            url: callbackUri,
-        }
-    }
-
-    @Get('auth/apple-callback')
-    @Redirect()
-    async appleCallback(
-        @Query() query
-    ) {
-        let uri = Buffer.from(query.state, 'base64').toString('ascii')
-        let code = query.code
-        let callbackUri = await this.appleService.generateCallbackUri(code, uri)
-
-        return {
-            statusCode: HttpStatus.FOUND,
-            url: callbackUri,
-        }
-    }
-
 }

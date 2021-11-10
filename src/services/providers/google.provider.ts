@@ -1,9 +1,8 @@
-import {HttpException, HttpStatus, Injectable} from "@nestjs/common";
+import {HttpException, HttpStatus} from "@nestjs/common";
 import {ConfigService} from "@nestjs/config";
 import axios from "axios";
 
-@Injectable()
-export class GoogleService {
+export class GoogleProvider implements SocialProviderInterface  {
     constructor(
         private configService: ConfigService,
     ) {}

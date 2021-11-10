@@ -1,11 +1,10 @@
-import {HttpException, HttpStatus, Injectable} from "@nestjs/common";
+import {HttpException, HttpStatus} from "@nestjs/common";
 import {ConfigService} from "@nestjs/config";
 import axios from "axios";
 import * as Jwt from "jsonwebtoken"
 import * as fs from "fs";
 
-@Injectable()
-export class AppleService {
+export class AppleProvider implements SocialProviderInterface {
     constructor(
         private configService: ConfigService,
     ) {}
